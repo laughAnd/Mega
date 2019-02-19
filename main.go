@@ -18,4 +18,6 @@ func main(){
 	controller.Startup()
 
 	http.ListenAndServe(":8888",context.ClearHandler(http.DefaultServeMux))
+	user := model.User{}
+	user.SetPassword("123456")
 }
