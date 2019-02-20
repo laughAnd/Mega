@@ -15,11 +15,17 @@
         {{end}}
 
         {{if .ProfileUser.LastSeen}}
-            <p>Last Seen:{{.ProfileUser.LastSeen}}</p>
+            <p>Last Seen on:{{.ProfileUser.LastSeen}}</p>
         {{end}}
-
+            <p>{{ .FollowersCount }} followers, {{ .FollowingCount }} following.</p>
         {{if .Editable}}
             <p><a href="/profile_edit">Edit your profile</a></p>
+        {{else}}
+        {{if .IsFollow}}
+            <p><a href="/unfollow/{{.ProfileUser.Username}}">Unfollow</a></p>
+        {{else}}
+            <p><a href="/follow/{{.ProfileUser.Username}}">Follow</a></p>
+        {{end}}
         {{end}}
         </td>
     </tr>

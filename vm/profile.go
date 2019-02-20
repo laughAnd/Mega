@@ -6,9 +6,12 @@ import (
 
 type ProfileViewModel struct {
 	BaseViewModel
-	Posts       []model.Post
-	Editable    bool
-	ProfileUser model.User
+	Posts          []model.Post
+	Editable       bool
+	IsFollow       bool
+	FollowersCount int
+	FollowingCount int
+	ProfileUser    model.User
 }
 
 type ProfileViewModelOp struct{}
@@ -16,15 +19,37 @@ type ProfileViewModelOp struct{}
 func (ProfileViewModelOp) GetVM(sUser, pUser string) (ProfileViewModel, error) {
 	v := ProfileViewModel{}
 	v.SetTitle("Profile")
-	u1, err := model.GetUserByUsername(pUser)
+	u, err := model.GetUserByUsername(pUser)
 	if err != nil {
 		return v, err
 	}
-	posts, _ := model.GetPostsByUserID(u1.ID)
-	v.ProfileUser = *u1
+	posts, _ := model.GetPostsByUserID(u.ID)
+	v.ProfileUser = *u
 	v.Editable = sUser == pUser
+
+	if !v.Editable {
+		v.IsFollow = u.IsFollowedByUser(sUser)
+	}
+	v.FollowersCount = u.FollowersCount()
+	v.FollowingCount = u.FollowingCount()
+
 	v.Posts = *posts
 	v.SetCurrentUser(sUser)
-
 	return v, err
+}
+
+// Follow func : A follow B
+func Follow(a, b string) error {
+	u, err := model.GetUserByUsername(a)
+	if err != nil {
+		return err
+	}
+	return u.Follow(b)
+}
+func UnFollow(a, b string) error {
+	u, err := model.GetUserByUsername(a)
+	if err != nil {
+		return err
+	}
+	return u.UnFollow(b)
 }
