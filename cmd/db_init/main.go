@@ -4,6 +4,7 @@ import(
 	"log"
 	"../../model"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"fmt"
 )
 
 func main(){
@@ -17,15 +18,19 @@ func main(){
 
 	user := []model.User{
 		{
-			Username:"linsan",
-			PasswordHash:model.GeneratePasswordHash("abc123"),
+			Username:     "linsan",
+			PasswordHash: model.GeneratePasswordHash("abc123"),
+			Email:        "i@bonfy.im",
+			Avatar:       fmt.Sprintf("https://www.gravatar.com/avatar/%s?d=identicon", model.Md5("i@bonfy.im")),
 			Posts:[]model.Post{
 				{Body:"Beautiful day in Portland"},
 			},
 		},
 		{
-			Username:"rene",
-			PasswordHash:model.GeneratePasswordHash("abc123"),
+			Username:     "rene",
+			PasswordHash: model.GeneratePasswordHash("abc123"),
+			Email:        "rene@test.com",
+			Avatar:       fmt.Sprintf("https://www.gravatar.com/avatar/%s?d=identicon", model.Md5("rene@test.com")),
 			Posts:[]model.Post{
 				{Body:"The Avengers movie was so cool!"},
 				{Body:"Sun shine is beautiful"},

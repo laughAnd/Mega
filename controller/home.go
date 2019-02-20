@@ -4,15 +4,22 @@ import(
 	"net/http"
 	"../vm"
 	"log"
+	"github.com/gorilla/mux"
+	"fmt"
 )
 
 type home struct{}
 
 func (h home) registerRoutes()  {
-	http.HandleFunc("/logout", middleAuth(logoutHandler))
-	http.HandleFunc("/login", loginHandler)
-	http.HandleFunc("/register", registerHandler)
-	http.HandleFunc("/", middleAuth(indexHandler))
+	r := mux.NewRouter()
+	r.HandleFunc("/logout", middleAuth(logoutHandler))
+	r.HandleFunc("/login", loginHandler)
+	r.HandleFunc("/register", registerHandler)
+	r.HandleFunc("/user/{username}", middleAuth(profileHandler))
+	r.HandleFunc("/profile_edit", middleAuth(profileEditHandler))
+	r.HandleFunc("/", middleAuth(indexHandler))
+
+	http.Handle("/", r)
 }
 
 
@@ -87,3 +94,43 @@ func logoutHandler(w http.ResponseWriter,r *http.Request) {
 	http.Redirect(w,r,"login",http.StatusTemporaryRedirect)
 }
 
+func profileHandler(w http.ResponseWriter, r *http.Request) {
+	tpName := "profile.html"
+	vars := mux.Vars(r)
+	pUser := vars["username"]
+	sUser, _ := getSessionUser(r)
+
+	vop := vm.ProfileViewModelOp{}
+	v, err := vop.GetVM(sUser, pUser)
+	if err != nil {
+		msg := fmt.Sprintf("User (%s) does not exist", pUser)
+		w.Write([]byte(msg))
+		return
+	}
+	templates[tpName].Execute(w, &v)
+}
+
+func profileEditHandler(w http.ResponseWriter, r *http.Request) {
+	tpName := "profile_edit.html"
+	username, _ := getSessionUser(r)
+	vop := vm.ProfileEditViewModelOp{}
+	v := vop.GetVM(username)
+
+	if r.Method == http.MethodGet {
+		err := templates[tpName].Execute(w, &v)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	if r.Method == http.MethodPost {
+		r.ParseForm()
+		aboutme := r.Form.Get("aboutme")
+		log.Println(aboutme)
+		if err := vm.UpdateAboutMe(username, aboutme); err != nil {
+			log.Println("update Aboutme error:", err)
+			w.Write([]byte("Error update aboutme"))
+			return
+		}
+		http.Redirect(w, r, fmt.Sprintf("/user/%s", username), http.StatusSeeOther)
+	}
+}

@@ -32,12 +32,4 @@ func GetMysqlConnectingString() string {
 	charset := viper.GetString("mysql.charset")
 
 	return fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=%s&parseTime=true", usr, pwd, host, db, charset)
-
-	//usr := "root"
-	//pwd := "password"
-	//host := "localhost"
-	//db := "go-mega"
-	//charset := "utf8"
-	//conn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=%s&parseTime=true", usr, pwd, host, db, charset)
-	//return  conn
 }
