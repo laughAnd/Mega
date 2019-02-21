@@ -24,7 +24,10 @@ func (h home) registerRoutes()  {
 	r.HandleFunc("/explore", middleAuth(exploreHandler))
 	r.HandleFunc("/reset_password_request", resetPasswordRequestHandler)
 	r.HandleFunc("/reset_password{token}", resetPasswordHandler)
+	r.NotFoundHandler = http.HandlerFunc(notfoundHandler)
+	r.HandleFunc("/404", notfoundHandler)
 	r.HandleFunc("/", middleAuth(indexHandler))
+	r.HandleFunc("/user/{username}/popup", popupHandler)
 
 	http.Handle("/", r)
 }
@@ -270,4 +273,28 @@ func resetPasswordHandler(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 		}
 	}
+}
+
+func notfoundHandler(w http.ResponseWriter, r *http.Request) {
+
+	flash := getFlash(w, r)
+	message := vm.NotFoundMessage{Flash: flash}
+	tpl, _ := template.ParseFiles("templates/404.html")
+	tpl.Execute(w, &message)
+}
+
+func popupHandler(w http.ResponseWriter, r *http.Request) {
+	tpName := "popup.html"
+	vars := mux.Vars(r)
+	pUser := vars["username"]
+	sUser, _ := getSessionUser(r)
+
+	vop := vm.ProfileViewModelOp{}
+	v, err := vop.GetPopupVM(sUser, pUser)
+	if err != nil {
+		msg := fmt.Sprintf("user ( %s ) does not exist", pUser)
+		w.Write([]byte(msg))
+		return
+	}
+	templates[tpName].Execute(w, &v)
 }

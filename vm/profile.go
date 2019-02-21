@@ -54,3 +54,22 @@ func UnFollow(a, b string) error {
 	}
 	return u.UnFollow(b)
 }
+
+func (ProfileViewModelOp) GetPopupVM(sUser, pUser string) (ProfileViewModel, error) {
+	v := ProfileViewModel{}
+	v.SetTitle("Profile")
+	u, err := model.GetUserByUsername(pUser)
+	if err != nil {
+		return v, err
+	}
+	v.ProfileUser = *u
+	v.Editable = sUser == pUser
+	if !v.Editable {
+		v.IsFollow = u.IsFollowedByUser(sUser)
+	}
+	v.FollowingCount = u.FollowingCount()
+	v.FollowersCount = u.FollowersCount()
+	v.SetCurrentUser(sUser)
+
+	return v, nil
+}

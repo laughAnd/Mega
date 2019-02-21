@@ -15,7 +15,7 @@
         {{end}}
 
         {{if .ProfileUser.LastSeen}}
-            <p>Last Seen on:{{.ProfileUser.LastSeen}}</p>
+            <p>Last Seen on:{{.ProfileUser.FormattedLastSeen }}</p>
         {{end}}
             <p>{{ .FollowersCount }} followers, {{ .FollowingCount }} following.</p>
         {{if .Editable}}
@@ -34,19 +34,46 @@
 <hr/>
 
 {{range .Posts}}
-<table>
+<table class="table table-hover">
     <tr valign="top">
-        <td><img src="{{.User.Avatar}}&s=36"></td>
-        <td><a href="/user/{{.User.Username}}">{{ .User.Username }}</a> says:<br>{{ .Body }}</td>
+        <td width="36px"><img src="{{.User.Avatar}}&s=36"></td>
+        <td><span class="user_popup"><a href="/user/{{.User.Username}}">{{ .User.Username }}</a></span>
+            said {{.FormattedTimeAgo}}:<br>{{ .Body }}</td>
     </tr>
 </table>
 {{end}}
 
-{{ if gt .PrevPage 0 }}
-<a href="/user/{{.ProfileUser.Username}}?page={{.PrevPage}}">Newer posts</a>
-{{ end }}
-{{ if gt .NextPage 0 }}
-<a href="/user/{{.ProfileUser.Username}}?page={{.NextPage}}">Older posts</a>
-{{ end }}
+
+<nav aria-label="...">
+    <ul class="pagination justify-content-center">
+    {{ if gt .PrevPage 0 }}
+        <li class="page-item">
+            <a href="/user/{{.ProfileUser.Username}}?page={{.PrevPage}}">
+                <span class="page-link" aria-hidden="true">&larr; Newer Posts</span>
+            </a>
+        </li>
+    {{ else }}
+        <li class="page-item disabled">
+            <a href="#">
+                <span class="page-link" aria-hidden="true">&larr; Newer Posts</span>
+            </a>
+        </li>
+    {{ end }}
+    {{ if gt .NextPage 0 }}
+        <li class="page-item">
+            <a href="/user/{{.ProfileUser.Username}}?page={{.NextPage}}">
+                <span class="page-link" aria-hidden="true">Older Posts &rarr;</span>
+            </a>
+        </li>
+    {{ else }}
+        <li class="page-item disabled">
+            <a href="#">
+                <span class="page-link" aria-hidden="true">Older Posts &rarr;</span>
+            </a>
+        </li>
+    {{ end }}
+
+    </ul>
+</nav>
 
 {{end}}

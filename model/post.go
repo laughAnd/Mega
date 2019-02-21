@@ -45,3 +45,7 @@ func GetPostsByPageAndLimit(page, limit int) (*[]Post, int, error) {
 
 	return &posts, total, nil
 }
+
+func (p *Post) FormattedTimeAgo() string {
+	return FromTime(*p.Timestamp)
+}

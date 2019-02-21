@@ -188,3 +188,7 @@ func CheckToken(tokenString string) (string, error) {
 		return "", err
 	}
 }
+
+func (u *User) FormattedLastSeen() string {
+	return u.LastSeen.Format("2006-01-02 15:04:05")
+}
